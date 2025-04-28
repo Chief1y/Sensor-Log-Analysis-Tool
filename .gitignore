@@ -1,0 +1,9 @@
+# I dont need that
+__pycache__/
+
+large_log.txt
+
+*.txt
+!sample_log.txt
+*.json
+!results.json
