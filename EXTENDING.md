@@ -1,6 +1,6 @@
 # Extending the Sensor Log Analysis Tool for New Sensor Types
 
-This document outlines how to extend the **Sensor Log Analysis Tool** to support a new sensor type, such as a noise detector (`noise`). The project is designed to be extensible, and below is a concise guide to adding a noise detector as an example, without modifying the existing implementation.
+This document outlines the **Example(!)** how to extend the **Sensor Log Analysis Tool** to support a new sensor type, such as a noise detector (`noise`). The project is designed to be extensible, and below is a concise guide to adding a noise detector as an example, without modifying the existing implementation.
 
 ## Step 1: Extract EvaluationCriteria into a Separate File
 
@@ -83,16 +83,6 @@ class NoiseCriteria(DeviationBasedCriteria):
 ```
 
 **Update `criteria_mapping` in `SensorEvaluator.__init__`**
-
-**Old Mapping**
-
-```
-self.criteria_mapping = {
-    "thermometer": ThermometerCriteria(),
-    "humidity": HumidityCriteria(),
-    "monoxide": MonoxideCriteria(),
-}
-```
 
 **New Mapping**
 
