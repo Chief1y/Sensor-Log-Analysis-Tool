@@ -134,15 +134,39 @@ thermometer temp-1
 2007-04-05T22:03 75.6
 2007-04-05T22:04 71.2
 2007-04-05T22:05 71.4
-2007-04-05T22:06 69.8
+2007-04-05T22:06 69.2
+2007-04-05T22:07 65.2
+2007-04-05T22:08 62.8
+2007-04-05T22:09 61.4
+2007-04-05T22:10 64.0
+2007-04-05T22:11 67.5
+2007-04-05T22:12 69.4
+thermometer temp-2
+2007-04-05T22:01 69.5
+2007-04-05T22:02 70.1
+2007-04-05T22:03 71.3
+2007-04-05T22:04 71.5
+2007-04-05T22:05 69.8
 humidity hum-1
-2007-04-05T22:00 45.2
-2007-04-05T22:01 45.3
-2007-04-05T22:02 45.4
+2007-04-05T22:04 45.2
+2007-04-05T22:05 45.3
+2007-04-05T22:06 45.1
+humidity hum-2
+2007-04-05T22:04 44.4
+2007-04-05T22:05 43.9
+2007-04-05T22:06 44.9
+2007-04-05T22:07 43.8
+2007-04-05T22:08 42.1
 monoxide mon-1
-2007-04-05T22:00 6
-2007-04-05T22:01 5
-2007-04-05T22:02 8
+2007-04-05T22:04 5
+2007-04-05T22:05 7
+2007-04-05T22:06 9
+monoxide mon-2
+2007-04-05T22:04 2
+2007-04-05T22:05 4
+2007-04-05T22:06 10
+2007-04-05T22:07 8
+2007-04-05T22:08 6
 ```
 
 #### Example Results (`results.json`)
@@ -150,20 +174,23 @@ monoxide mon-1
 ```json
 {
   "temp-1": "precise",
+  "temp-2": "ultra precise",
   "hum-1": "keep",
-  "mon-1": "keep"
+  "hum-2": "discard",
+  "mon-1": "keep",
+  "mon-2": "discard"
 }
 ```
 
 ### 2. Generate a Custom Log File
 
-Use the `generate_large_log.py` script to create a log file for testing. The script allows customization of sensor counts and value ranges (see comments in the script for details).
+Use the `log_gen.py` script to create a log file for testing. The script allows customization of sensor counts and value ranges (see comments in the script for details).
 
 ```
-python generate_large_log.py --thermometers 250000 --humidity-sensors 200000 --monoxide-sensors 150000 --output random_log.txt
+python log_gen.py --thermometers 250 --humidity-sensors 200 --monoxide-sensors 100 --output large_log.txt
 ```
 
-This will generate a log file with 250,000 thermometers, 200,000 humidity sensors, and 150,000 monoxide sensors. You can modify the following in `generate_large_log.py`:
+This will generate a log file named large_log.txt with 250 thermometers, 200 humidity sensors, and 100 monoxide sensors. You can modify the following in `log_gen.py`:
 - Reference values (e.g., `reference 70.0 45.0 6`).
 - Start time for timestamps.
 - Number of readings per sensor (e.g., 3 to 20 for thermometers).
@@ -174,13 +201,13 @@ This will generate a log file with 250,000 thermometers, 200,000 humidity sensor
 Analyze the generated log file:
 
 ```
-python main.py random_log.txt --output results.json
+python main.py <any_log>.txt --output results.json
 ```
 
 If no output file is specified, results will be printed to stdout:
 
 ```
-python main.py random_log.txt
+python main.py <any_log>.txt
 ```
 
 ### 4. Analyze Results
@@ -277,12 +304,92 @@ The project was developed over the following timeline:
 - **Documentation and Refinement (3 hours)**: Code commenting, writing the `README.md`, adding additional features (e.g., result analysis), and ensuring compliance with best practices.
 - **Total**: Approximately 7 hours.
 
+## AI Usage
+
+I used AI tools (Grok by xAI and ChatGPT by OpenAI) to assist with specific tasks during development:
+- **Grok**: Helped with code optimisation, some unknown python syntax for me (I can say I am new to python, still learning), formatting the `README.md` and suggested test cases for unit tests.
+- **ChatGPT**: Provided ideas for the initial project architecture and separation of concerns.
+
+All core logic, design decisions, and implementation were done by me, with AI serving as a supportive tool to speed up certain aspects of the process.
+
+## Example AI Prompt
+
+Below is a prompt I used to address a critical scalability issue during development:
+
+### Prompt: Initial Project Architecture
+
+>You are helping me design a scalable, production-ready solution for a developer audition task.
+
+>Task description:
+>The company manufactures inexpensive home sensors (thermometers, humidity sensors, CO sensors). To check their quality, they place the sensors in a test room with known conditions (constant temperature, humidity, CO concentration) and record the sensor readings over time.
+>
+>My goal:
+>- Parse a text log containing the test results (sensor data and timestamps).
+>- For each sensor, classify its performance based on specific criteria (accuracy, stability).
+>- Return a summary of sensor classifications as JSON.
+>
+>The solution must be:
+>- Easy to extend when new types of sensors appear (e.g., noise detectors).
+>- Scalable for very large log files.
+>- Structured cleanly with separation of concerns (parsing, evaluation, output).
+>
+>Please suggest:
+>1. The best high-level architecture (classes, modules, patterns if needed).
+>2. A clear separation between parsing, evaluating, and outputting results.
+>3. Ways to make it easily extensible for new sensors.
+>4. Good practices for handling messy or incomplete data.
+>5. (Optional) Future ideas for using AI to automate evaluation even more.
+>
+>Please answer step-by-step, with bullet points if possible.
+>Keep the focus on clean, real-world production code.
+
+**Result**: ChatGPT suggested clear high-level architecture, some good practices for messy or incomplete data and gave some
+future AI ideas for such project.
+
+### Prompt: Optimizing Parsing for Large Files
+
+> We've made good progress with the initial implementation. However, I’ve run into a critical issue: the current parsing logic in `parser.py` loads the entire log file into memory before processing, which causes the program to crash when handling large files (e.g., a 56-million-line log with 5.5 million sensors). This is a major bottleneck for scalability, which is a key requirement for the project.
+>
+> Here’s the current approach in `parser.py`:
+>
+> ```
+> def parse_records(self):
+>     with open(self.log_file, "r") as f:
+>         lines = f.readlines()[1:]  # Skip the reference line
+>         # ... process all lines at once ...
+> ```
+>
+> I need to fix this to make the solution truly scalable. Please suggest:
+> 1. A memory-efficient approach to parse the log file without loading it entirely into memory.
+> 2. How to modify the `parse_records` method to integrate this approach while keeping it compatible with the rest of the pipeline (which expects an iterator of `SensorRecord` objects).
+> 3. Any potential trade-offs or considerations for this new approach in a production environment.
+>
+> The solution should prioritize low memory usage and scalability for very large files. I’m using Python, and code snippets would be helpful.
+
+**Result**: Grok suggested using a streaming approach with Python generators (`yield`) to process the file line by line, avoiding loading the entire file into memory. I implemented this in `parser.py`, which resolved the crashes and made the solution scalable for large logs, such as the 56-million-line test file.
+
 ## Future Improvements
 
 - Add parallel processing to further improve performance for large logs.
 - Support grouping of results by sensor type in the output JSON (e.g., separate sections for thermometers, humidity sensors, etc.).
 - Enhance error handling for malformed log files.
 - Add more configuration options for evaluation criteria via command-line arguments or a config file.
+
+## AI Ideas
+
+- Data labeling: Collect enough labeled examples (good sensor vs bad sensor).
+
+- Train simple ML models (e.g., small tree-based models or anomaly detectors) for prediction.
+
+- Hybrid approach:
+
+  Start with rule-based evaluation.
+
+  Add ML anomaly detection as an "advisory" second opinion.
+
+- Auto-clustering:
+
+  Use unsupervised methods (like DBSCAN) to group sensor behaviors without manual thresholds.
 
 ## License
 
