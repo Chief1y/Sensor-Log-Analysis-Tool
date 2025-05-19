@@ -27,7 +27,7 @@ The project follows a modular and object-oriented design to ensure maintainabili
   - Command-line interface to run the analysis with input and output file arguments.
 
 - **Utilities**:
-  - `generate_large_log.py`: Generates synthetic log files with configurable sensor counts and value ranges.
+  - `log_gen.py`: Generates synthetic log files with configurable sensor counts and value ranges.
   - `analyze_results.py`: Analyzes the distribution of sensor evaluation statuses from the results JSON file.
 
 - **Tests (`tests/`)**:
@@ -43,7 +43,7 @@ The project follows a modular and object-oriented design to ensure maintainabili
   - `config.py`: Configuration for evaluation thresholds.
 - `tests/`: Unit tests for all modules.
 - `main.py`: Entry point for running the analysis.
-- `generate_large_log.py`: Utility to generate large log files for testing.
+- `log_gen.py`: Utility to generate large log files for testing.
 - `analyze_results.py`: Utility to analyze the distribution of sensor evaluation results.
 - `sample_log.txt`: Example log file from the project requirements.
 - `results.json`: Example output file generated from `sample_log.txt`.
@@ -278,7 +278,7 @@ The tool is designed for high performance and scalability. Below are results fro
 - **Test 1: 5.5 Million Sensors**
 
   ```
-  python generate_large_log.py --thermometers 2500000 --humidity-sensors 2000000 --monoxide-sensors 1000000 --output large_log.txt
+  python log_gen.py --thermometers 2500000 --humidity-sensors 2000000 --monoxide-sensors 1000000 --output large_log.txt
   ```
 
   - Generated log file: `large_log.txt` with 56,830,243 lines.
@@ -288,7 +288,7 @@ The tool is designed for high performance and scalability. Below are results fro
 - **Test 2: 550,000 Sensors**
 
   ```
-  python generate_large_log.py --thermometers 250000 --humidity-sensors 200000 --monoxide-sensors 100000 --output large_log.txt
+  python log_gen.py --thermometers 250000 --humidity-sensors 200000 --monoxide-sensors 100000 --output large_log.txt
   ```
 
   - Generated log file: `large_log.txt` with 5,676,936 lines.
